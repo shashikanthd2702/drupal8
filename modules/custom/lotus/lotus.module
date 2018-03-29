@@ -1,0 +1,45 @@
+<?php
+use Drupal\node\Entity\Node;
+use Drupal\user\Entity\User;
+
+
+function lotus_cron() {
+
+$result = \Drupal::entityQuery("node")
+		->condition('created', strtotime('-30 days'), '<=')
+		->execute();
+		$storage_handler = \Drupal::entityTypeManager()->getStorage("node");
+		$entities = $storage_handler->loadMultiple($result);
+		$storage_handler->delete($entities);
+		
+ $old_nodes = \Drupal::service('lotus.old_nodes')->load();
+  foreach ($old_nodes as $node) {
+    $node->setPublished(false);
+    $node->save();
+}
+
+}
+
+
+function lotus_user_update(\Drupal\Core\Entity\EntityInterface $entity){
+  $user = User::load($entity->id());
+  $role = $user->hasRole('moderated');
+  if($role){
+    $query = \Drupal::entityQuery('node')
+      ->condition('uid', $user->id());
+    $nids = $query->execute();
+    $nodes = Node::loadMultiple($nids);
+	//print_r($nodes); die;
+    foreach($nodes as $node) {
+     $old_title = $node->title->value;
+      if(strpos($old_title,'(MODERATED USER)') == FALSE) {
+        $node->set("title",  $old_title . " (MODERATED USER)");
+        $node->save();
+
+      }
+    }
+    drupal_set_message('All nodes of the user updated');
+  }
+}
+
+

@@ -1,0 +1,7 @@
+lotus.offers_controller_hello:
+  path: '/offers/hot/{count}/{second_count}'
+  defaults:
+    _controller: '\Drupal\lotus\Controller\OffersController::hello'
+    _title: 'Offers'
+  requirements:
+    _permission: 'access content'

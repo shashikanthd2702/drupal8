@@ -1,0 +1,6 @@
+name: Lotus custom module
+type: module
+core: '8.x'
+description: 'Sample module to learn D7 to D8 coding'
+package: Custom
+version: 8.x

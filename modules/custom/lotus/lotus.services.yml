@@ -1,0 +1,4 @@
+services:
+  lotus.old_nodes:
+    class: \Drupal\lotus\OldNodesService
+    arguments: ["@entity_type.manager"]
