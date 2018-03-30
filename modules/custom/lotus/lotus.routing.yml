@@ -5,3 +5,10 @@ lotus.offers_controller_hello:
     _title: 'Offers'
   requirements:
     _permission: 'access content'
+lotus.simple_form:
+  path: '/simple-form'
+  defaults:
+    _form: '\Drupal\lotus\Form\SimpleForm'
+    _title: 'Simple Form Example'
+  requirements:
+    _permission: 'access content'
