@@ -1,7 +1,52 @@
 <?php
 use Drupal\node\Entity\Node;
 use Drupal\user\Entity\User;
+use Drupal\Core\Database\Database;
 
+function lotus_update_8001(&$sandbox){
+	
+	$spec = [
+		'type' => 'varchar',
+		'description' => 'New col',
+		'length' => 20,
+		'not null' => FALSE,
+		];
+		
+	$schema = Database::getConnection()->schema();
+	$schema->addField('lotus', 'newcol', $spec);
+	//$schema->addIndex('lotus', ['newcol']);
+}
+
+ function lotus_update_8002(&$sandbox) {
+  $spec = array(
+    'description' => 'My description',
+    'fields' => array(
+      'myfield1' => array(
+        'description' => 'Myfield1 description.',
+        'type' => 'varchar',
+        'length' => 150,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'myfield2' => array(
+        'description' => 'Myfield2 description',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('myfield1'),
+  ); 
+ $schema = Database::getConnection()->schema();
+ $schema->createTable('lotustwo', $spec);
+}
+
+function lotus_post_update_change_title_of_node() {
+  $node = \Drupal::entityManager()->loadEntityByUuid('b9642cdc-b122-4628-827e-3a0912039398');
+  $node->setTitle('hello world');
+  $node->save();
+
+  return t('Node successfully updated.');
+}
 
 function lotus_cron() {
 
@@ -17,6 +62,20 @@ $result = \Drupal::entityQuery("node")
     $node->setPublished(false);
     $node->save();
 }
+
+
+//Block users who have not logged in for last 6 months
+  $result = \Drupal::entityQuery("user")
+    ->condition('login', strtotime('-6 months'), '<=')
+    ->execute();
+
+  $storage_handler = \Drupal::entityTypeManager()->getStorage("user");
+
+  foreach ($result AS $user) {
+    $entity = $storage_handler->load($user);
+    $entity->block();
+    $storage_handler->save($entity);
+  }
 
 }
 
@@ -40,6 +99,179 @@ function lotus_user_update(\Drupal\Core\Entity\EntityInterface $entity){
     }
     drupal_set_message('All nodes of the user updated');
   }
+}
+
+
+/**
+ * Implements hook_schema().
+ *
+ * Defines the database tables used by this module.
+ *
+ * @see hook_schema()
+ *
+ * @ingroup lotus
+ */
+function lotus_schema() {
+  $schema['lotus'] = array(
+    'description' => 'Stores example person entries for demonstration purposes.',
+    'fields' => array(
+      'pid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique person ID.',
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => "Creator user's {users}.uid",
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Name of the person.',
+      ),
+      'surname' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Surname of the person.',
+      ),
+      'age' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => 'The age of the person in years.',
+      ),
+    ),
+    'primary key' => array('pid'),
+    'indexes' => array(
+      'name' => array('name'),
+      'surname' => array('surname'),
+      'age' => array('age'),
+    ),
+  );
+
+  return $schema;
+}
+
+
+/**
+ * Implements hook_install().
+ *
+ * Creates some default entries on this module custom table.
+ *
+ * @see hook_install()
+ *
+ * @ingroup lotus
+ */
+function lotus_install() {
+  $database = \Drupal::database();
+  // Add a default entry.
+  $fields = array(
+    'name' => 'John',
+    'surname' => 'Doe',
+    'age' => 0,
+  );
+  $database->insert('lotus')
+    ->fields($fields)
+    ->execute();
+
+  // Add another entry.
+  $fields = array(
+    'name' => 'John',
+    'surname' => 'Roe',
+    'age' => 100,
+    'uid' => 1,
+  );
+  $database->insert('lotus')
+    ->fields($fields)
+    ->execute();
+}
+
+
+/**
+* Implements hook_preprocess_page()
+* $variables contains all variables used for the template.
+* $hook should be ‘page’ in this case. 
+**/
+function lotus_preprocess_page(&$variables, $hook) {
+  // Rendering a table inside the template
+  // Using a render array is the best practice here - Twigg will render it correctly.
+  
+ $header = [
+     'userid' => t('User id'),
+     'Username' => t('username'),
+     'email' => t('Email'),
+   ];
+   
+ $query = \Drupal::database()->select('users_field_data', 'u');
+$query->fields('u', ['uid','name','mail']);
+$results = $query->execute()->fetchAll();
+
+
+// Initialize an empty array
+$output = array();
+// Next, loop through the $results array
+foreach ($results as $result) {
+     if ($result->uid != 0 && $result->uid != 1) {
+       $output[$result->uid] = [
+         'userid' => $result->uid,     // 'userid' was the key used in the header
+         'Username' => $result->name, // 'Username' was the key used in the header
+         'email' => $result->mail,    // 'email' was the key used in the header
+       ];
+     }
+   }
+
+  $variables['table'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $output,
+  );
+
+  //print_r($variables); die;
+  //Add a JS library
+  $variables['#attached']['library'][] = 'lotus/lotus-js';
+}
+
+/**
+* Implements hook_theme_suggestions_page_alter()
+* $variables contains all variables used for the template.
+* $suggestions will contain the current suggestions for the hook 
+* ‘page’ in this case. 
+**/
+
+function lotus_theme_suggestions_page_alter(array &$suggestions, array $variables) {
+  // Add a new suggestion for a page template
+  // This allows us to use a template name page--lotus.tpl.php
+  
+ /*  $suggestions[] =  'page__lotus'; */
+}
+
+/**
+* Implements hook_theme() to add the template definition. 
+**/
+
+function lotus_theme($existing, $type, $theme, $path) {
+
+return array(
+	'lotus_template' => array(
+		'variables' => array('test_var' => NULL, 'test_var2' => "TestValue2"),
+	),
+);
+}
+
+
+function lotus_preprocess_html(&$variables) {
+  $lotus_height = '300px';
+
+  //Add a JS library
+  $variables['#attached']['library'][] = 'lotus/lotus-js';
+$variables['#attached']['drupalSettings']['lotus']['lotusJS']['lotus_height'] = $lotus_height;
 }
 
 

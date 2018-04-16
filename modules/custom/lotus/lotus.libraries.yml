@@ -1,0 +1,7 @@
+lotus-js:
+  version: 1.x
+  js:
+    js/lotus.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings

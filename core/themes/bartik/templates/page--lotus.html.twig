@@ -1,0 +1,16 @@
+{#  Add classes in templates is a prefered way in Drupal 8 - start #}
+
+{%
+  set classes = [
+    'new-class',
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {#  Print the table variable #}
+  <div class='table'>
+    {{ table }}
+  </div>
+  {# Print the text and link to create new content #}
+    <p>{{ 'To create some content <a href="@create-content">click here</a>.'|t({'@create-content': '/admin/structure/types/add' }) }}</p>
+</div>
+{#  Add classes in templates is a prefered way in Drupal 8  - end#}

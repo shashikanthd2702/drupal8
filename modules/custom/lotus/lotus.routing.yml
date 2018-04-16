@@ -1,14 +1,49 @@
-lotus.offers_controller_hello:
+lotus.offers:
   path: '/offers/hot/{count}/{second_count}'
   defaults:
-    _controller: '\Drupal\lotus\Controller\OffersController::hello'
+    _controller: '\Drupal\lotus\Controller\LotusController::hello'
     _title: 'Offers'
   requirements:
     _permission: 'access content'
+lotus.create_user:
+  path: '/create-user'
+  defaults:
+    _controller: '\Drupal\lotus\Controller\LotusController::create_new_user'
+    _title: 'Create User'
+  requirements:
+    _permission: 'access content'
+lotus.update_user:
+  path: '/update-user/{uid}'
+  defaults:
+    _controller: '\Drupal\lotus\Controller\LotusController::update_user'
+    _title: 'Update User'
+  requirements:
+    _permission: 'access content'
+lotus.create_node:
+  path: '/create-node'
+  defaults:
+    _controller: '\Drupal\lotus\Controller\LotusController::create_node'
+    _title: 'Create Node'
+  requirements:
+    _permission: 'access content'
+lotus.create_taxanomy:
+  path: '/create-taxanomy'
+  defaults:
+    _controller: '\Drupal\lotus\Controller\LotusController::create_taxanomy'
+    _title: 'Create Taxanomy'
+  requirements:
+    _permission: 'access content'	
 lotus.simple_form:
   path: '/simple-form'
   defaults:
     _form: '\Drupal\lotus\Form\SimpleForm'
     _title: 'Simple Form Example'
+  requirements:
+    _permission: 'access content'
+lotus.lotus_theme:
+  path: '/lotus-theme'
+  defaults:
+    _controller: '\Drupal\lotus\Controller\LotusController::content'
+    _title: 'Lotus theme value'
   requirements:
     _permission: 'access content'
