@@ -18,7 +18,7 @@ class LotusController extends ControllerBase {
    * @return string
    *   Return Hello string.
    */
-  public function hello($count,$second_count) {
+public function hello($count,$second_count) {
 
     return [
       '#type' => 'markup',
@@ -40,18 +40,18 @@ public function content(){
 
   $user = User::create();
 
-  //Mandatory settings
+   /* Mandatory settings */
   $user->setPassword('admin123');
   $user->enforceIsNew();
   $user->setEmail('shashishaiva27@gmail.com');
 
-  //This username must be unique and accept only a-Z,0-9, - _ @ .
+  /* This username must be unique and accept only a-Z,0-9, - _ @ . */
   $user->setUsername('shashishaiva27'); 
   
-  //add role to user
+  /* add role to user */ 
   $user->addRole('moderated');
 
-  //Optional settings
+  /* Optional settings */
   $language = 'en';
   $user->set("init", 'email');
   $user->set("langcode", $language);
@@ -59,7 +59,7 @@ public function content(){
   $user->set("preferred_admin_langcode", $language);
   $user->activate();
 
-  //Save user
+  /* Save user */
   $user->save();
   drupal_set_message("User with uid " . $user->id() . " saved!\n");
  return $this->redirect('<front>');
