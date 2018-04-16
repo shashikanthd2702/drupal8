@@ -67,16 +67,16 @@ public function content(){
 
 
 function update_user($uid = ''){
-	// Updating a user is a three step process:
-// 1) load the user object to change
-// 2) set property/field to new value
-// 3) Save the user object.
-
-// This example updates:
-// 1) password
-// 2) email
-// 3) login
-// 4) a plain text field.
+/* 	 Updating a user is a three step process:
+ 1) load the user object to change
+ 2) set property/field to new value
+ 3) Save the user object.
+ */
+/*  This example updates:
+1) password
+2) email
+3) login
+4) a plain text field. */
 
 // $uid is the user id of the user user update
 $user = \Drupal\user\Entity\User::load($uid);
