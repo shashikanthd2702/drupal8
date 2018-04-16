@@ -78,7 +78,7 @@ function update_user($uid = ''){
 3) login
 4) a plain text field. */
 
-// $uid is the user id of the user user update
+/*  $uid is the user id of the user user update */
 $user = \Drupal\user\Entity\User::load($uid);
 //print_r($user); die;
 // Example 1: password
